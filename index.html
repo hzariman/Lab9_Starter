@@ -87,7 +87,31 @@
     </section>
   </main>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+
+    window.TrackJS && TrackJS.install({ 
+        token: "4041f2cb2f884fdda149b20434698e2b"
+        // for more configuration options, see https://docs.trackjs.com
+    });
+    
+    class InputError extends Error {
+      constructor(errorMsg) {
+        super(errorMsg);
+        this.name = "Input Error";
+      }
+    }
+    function checkVal(number) {
+      if (number.length == 0) {
+        throw new InputError("Input is empty, please insert a value");
+      };
+
+      if (!/^\d+$/.test(number)) {
+        throw new InputError("Input must only contain numbers");
+      };
+    };
+    
+    
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +119,143 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        checkVal(firstNum);
+        checkVal(secondNum);
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } 
+      
+      catch (err) {
+        console.error(err);
+        TrackJS.track(err);
+      }
+
+      finally {
+        console.log("Operation attempt completed");
+      }
+      
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+    function handleButtonCase(button) {
+      switch (button.innerHTML) {
+        case 'Console Log':
+          button.addEventListener("click", () => {
+            console.log("Console Log Demo");
+          });
+          break;
+        
+
+        case 'Console Error':
+          button.addEventListener("click", () => {
+            console.error("Console Error Demo");
+          });
+          break;
+
+        case 'Console Count':
+          button.addEventListener("click", () => {
+            console.count("Count Button");
+          });
+          break;
+
+        case 'Console Warn':
+          button.addEventListener("click", () => {
+            console.warn("Console Warn Button");
+          });
+          break;
+
+        case 'Console Assert':
+          button.addEventListener("click", () => {
+            let number = 2;
+            let errorMsg = "The number does not equal 3";
+            console.assert(number === 3, '%o', { number, errorMsg });
+          });
+          break;
+
+        case 'Console Clear':
+          button.addEventListener("click", () => {
+            console.clear();
+          });
+          break;
+
+        case 'Console Dir':
+          button.addEventListener("click", () => {
+            console.dir(button);
+          });
+          break;
+
+        case 'Console dirxml':
+          button.addEventListener("click", () => {
+            console.dirxml(button);
+          });
+          break;
+
+        case 'Console Group Start':
+          button.addEventListener("click", () => {
+            console.group();
+          });
+          break;
+
+        case 'Console Group End':
+          button.addEventListener("click", () => {
+            console.groupEnd();
+          });
+          break;
+        
+        case 'Console Table':
+          let tableContent = [
+            ["Software Engineering", 110],
+            ["Programming Languages", 130], 
+            ["Advanced Software Engineering", 112] 
+          ];
+          button.addEventListener("click", () => {
+            console.table(tableContent);
+          });
+          break;
+
+        case 'Start Timer':
+          button.addEventListener("click", () => {
+            console.time("Timer Button");
+          });
+          break;
+
+        case 'End Timer':
+          button.addEventListener("click", () => {
+            console.timeEnd("Timer Button");
+          });
+          break;
+        
+        case 'Console Trace':
+          button.addEventListener("click", () => {
+            function deep() {
+              function deeper() {
+                function deepest() {
+                  console.trace();
+                }
+                deepest();
+              }
+              deeper();
+            }
+            deep();
+          });
+          break;
+
+        case 'Trigger a Global Error':
+          button.addEventListener("click", () => {
+            console.log(undefinedVar);
+          });
+          break;
+
+        
+      }
+    }
+
+    errorBtns.forEach(handleButtonCase);
+
+
   </script>
 </body>
 
